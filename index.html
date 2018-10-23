@@ -5,160 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="layout.css">
+    <!-- <link rel="stylesheet" href="test4.css"> -->
     <link rel="stylesheet" href="material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <script src="material.min.js"></script>
+    <script src="jquery-3.3.1.min.js"></script>
     <script src="fabric.min.js"></script>
     <script src="FileSaver.js"></script>
     <script src="canvas-toBlob.js"></script>
-    <script src="jquery-3.3.1.min.js"></script>
+    <script src="material.min.js"></script>
+    <link rel="shortcut icon" href="">
     <title>IYF</title>
 </head>
 <body>
     <div class="container">
         
         <div class="wrapper">
-            <div class="title">
-                <h4>Informatics Youth Festival</h3>
+            <div class="editor">
+                <div class="canvas-padding">
+                    <canvas id="c"></canvas>
                 </div>
-                <div class="editor">
-                    <div class="center-canvas">
-                        <canvas id="c" width="233" height="291"></canvas>
-                    </div>
-                    <div class="upload">
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
-                            <input class="mdl-textfield__input" placeholder="Unggah foto mu!" type="text" id="uploadFile" readonly/>
-                            <div class="mdl-button mdl-button--primary mdl-button--icon mdl-button--file">
-                                <i class="material-icons">attach_file</i><input type="file" id="uploadBtn">
-                            </div>
+                <div class="tombol">                        
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
+                        <input class="mdl-textfield__input" placeholder="Unggah foto mu!" type="text" id="uploadFile" readonly/>
+                        <div class="mdl-button mdl-button--primary mdl-button--icon mdl-button--file">
+                            <i class="material-icons">attach_file</i><input type="file" id="uploadBtn">
                         </div>
-                        
                     </div>
-                    
-                </div>
-                <div class="control">
-                    
-                    <p style="width:200px">
-                        Skala
-                        <input  id="skala" class="mdl-slider mdl-js-slider" type="range"  min="0.01" max="3" value="1.5" step="0.01">
-                    </p>
-                    <p style="width:200px">
-                        Rotasi
-                        <input class="mdl-slider mdl-js-slider" type="range" id="s1" min="0" max="100" value="50">
-                    </p>
-                    <p style="width:200px">
-                        Posisi X
-                        <input class="mdl-slider mdl-js-slider" type="range" id="s1" min="0" max="100" value="50">
-                    </p>
-                    <p style="width:200px">
-                        Posisi Y
-                        <input class="mdl-slider mdl-js-slider" type="range" id="s1" min="0" max="100" value="50">
-                    </p>
+                   
                     <br>
-                    <p>
-                        <button id="download" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">unduh</button>   
-                    </p>
+                    <button id="download" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">unduh</button>   
+                    
                 </div>
             </div>
-        </div>
-        
-    </body>
-    <script>
-        document.getElementById("uploadBtn").onchange = function () {
-            document.getElementById("uploadFile").value = this.files[0].name;
-        };
-        var canvas = new fabric.Canvas('c');
-        // canvas.setWidth(1080);
-        // canvas.setHeight(1350);
-        
-        var canvasWrapper = document.getElementById('c');
-        var canvasWrapperWidth = canvasWrapper.clientWidth;
-        $(function () {
-            $(":file").change(function () {
-                if (this.files && this.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = imageIsLoaded;
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });
-        });
-        fabric.Image.fromURL('twibbon iyf empty.png',function(img){
-            img.scaleToWidth(canvas.getWidth());
-            canvas.setOverlayImage(img, canvas.renderAll.bind(canvas));
-        });
-        function imageIsLoaded(e) {
-            //console.log('ini jalan');
-            fabric.Image.fromURL(e.target.result,function(img){
-                var aspectRatio = 291/233;
-                var factor = 233 / img.width;
-                img.set({
-                    scaleX: factor,
-                    scaleY: factor 
-                });
-                canvas.add(img);
-                var scaleControl = document.getElementById('skala');
-                //console.log(scaleControl);
-                scaleControl.oninput = function() {
-                    console.log('oiiiii');
-                    img.scale(parseFloat(this.value)).center().setCoords();
-                    canvas.requestRenderAll();
-                };
-                function updateControls() {
-                    scaleControl.value = img.scaleX;
-                    /*angleControl.value = img.angle;
-                    leftControl.value  = img.left;
-                    topControl.value   = img.top;
-                    skewXControl.value = img.skewX;
-                    skewYControl.value = img.skewY;*/
-                }
-                canvas.on({
-                    'object:moving': updateControls,
-                    'object:scaling': updateControls,
-                    'object:resizing': updateControls,
-                    'object:rotating': updateControls,
-                    'object:skewing': updateControls
-                });
-                canvas.item(0).set({
-                    borderColor: 'gray',
-                    cornerColor: 'black',
-                    cornerSize: 20,
-                    transparentCorners: true
-                });
-                canvas.setActiveObject(canvas.item(0));
-                // this.__canvases.push(canvas);
-                canvas.sendToBack(img);
-                
-                
-                
-            });
-        };
-        
-        
-        
-        $("#download").click(function(){
-            $("#c").get(0).toBlob(function(blob){
-
-                var scaleMultiplier = 1080 / canvas.width;
-                var objects = canvas.getObjects();
-                for (var i in objects) {
-                    objects[i].scaleX = objects[i].scaleX * scaleMultiplier;
-                    objects[i].scaleY = objects[i].scaleY * scaleMultiplier;
-                    objects[i].left = objects[i].left * scaleMultiplier;
-                    objects[i].top = objects[i].top * scaleMultiplier;
-                    objects[i].setCoords();
-                }
-                
-                canvas.setWidth(canvas.getWidth() * scaleMultiplier);
-                canvas.setHeight(canvas.getHeight() * scaleMultiplier);
-                canvas.renderAll();
-                canvas.calcOffset();
-                
-                canvas.toDataURL();
-                saveAs(blob, "myIMG.png");
-            });
-        });
-        // var $ = function(id){return document.getElementById(id)};
-        
-        
-    </script>
-    </html>
+            
+            <div class="control">
+                <h3 class="headline">IYF VI</h1>
+                    
+                    <h4>Ayo buat foto IYF mu!</h3>
+                        <p>
+                            Unggah foto                  
+                        </p>
+                        <!-- <input type="file" id="d"> -->
+                        <h4>Tentang IYF</h3>
+                            <p>
+                                    Informatics Youth Festival (IYF) adalah agenda tahunan jurusan Teknik Informatika UIN Sultan Syarif Kasim Riau.
+                            </p>
+                        </div>
+                        <!-- <div class="about">
+                        </div> -->
+                        <div class="contact">
+                            
+                            <div class="nomor">
+                                <h5>Kontak IYF</h1>
+                                    <ul>
+                                        <li>Rahmat Yasmin <br> <p>082283575845</p></li>
+                                    </ul>
+                                </div>
+                                <div class="sosmed">
+                                    <h5>Sosial Media IYF VI</h1>
+                                        <ul>
+                                            <li>Instagram <a href="http://instagram.com/himatifuinsuska">Himatif</a></li>
+                                            <li>Instagram <a href="https://instagram.com/informaticsyouthfest">IYF</a></li>
+                                            <li>Situs Web <a href="https://himatif.uin-suska.ac.id/">Himatif</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="sosmed">
+                                       
+                                        </div>
+                                    </div>
+                                </div>
+                                <script>
+                                    document.getElementById("uploadBtn").onchange = function () {
+                                        document.getElementById("uploadFile").value = this.files[0].name;
+                                    };
+                                    var canvas = new fabric.Canvas('c');
+                                    canvas.setWidth(1080);
+                                    canvas.setHeight(1350);
+                                    
+                                    var canvasWrapper = document.getElementById('c');
+                                    var canvasWrapperWidth = canvasWrapper.clientWidth;
+                                    $(function () {
+                                        $(":file").change(function () {
+                                            if (this.files && this.files[0]) {
+                                                var reader = new FileReader();
+                                                reader.onload = imageIsLoaded;
+                                                reader.readAsDataURL(this.files[0]);
+                                            }
+                                        });
+                                    });
+                                    fabric.Image.fromURL('twibbon iyf empty.png',function(img){
+                                        img.scaleToWidth(canvas.getWidth());
+                                        canvas.setOverlayImage(img, canvas.renderAll.bind(canvas));
+                                    });
+                                    function imageIsLoaded(e) {
+                                        fabric.Image.fromURL(e.target.result,function(img){
+                                            var aspectRatio = 1350/1080;
+                                            var factor = 1080 / img.width;
+                                            img.set({
+                                                scaleX: factor,
+                                                scaleY: factor 
+                                            });
+                                                                                        canvas.add(img);
+                                            canvas.item(0).set({
+                                                borderColor: 'gray',
+                                                cornerColor: 'black',
+                                                cornerSize: 70,
+                                                borderScaleFactor: 10,
+                                                hasBorders: true,
+                                                
+                                                rotatingPointOffset:200,
+                                                padding:60, 
+                                                transparentCorners: true
+                                            });
+                                            canvas.setActiveObject(canvas.item(0));
+                                            this.__canvases.push(canvas);
+                                            canvas.sendToBack(img);
+                                        });
+                                    };
+                                    $("#download").click(function(){
+                                        $("#c").get(0).toBlob(function(blob){
+                                            saveAs(blob, "myIMG.png");
+                                        });
+                                    });
+                                </script>
+                            </body>
+                            </html>
